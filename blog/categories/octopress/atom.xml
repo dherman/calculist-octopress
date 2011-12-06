@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Octopress | The Little Calculist]]></title>
   <link href="http://calculist.org/blog/categories/octopress/atom.xml" rel="self"/>
   <link href="http://calculist.org/"/>
-  <updated>2011-12-05T21:07:52-08:00</updated>
+  <updated>2011-12-05T21:21:51-08:00</updated>
   <id>http://calculist.org/</id>
   <author>
     <name><![CDATA[Dave Herman]]></name>
@@ -12,6 +12,20 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Obligatory fawning over Octopress]]></title>
+    <link href="http://calculist.org/blog/2011/12/05/obligatory-fawning-over-octopress/"/>
+    <updated>2011-12-05T21:14:00-08:00</updated>
+    <id>http://calculist.org/blog/2011/12/05/obligatory-fawning-over-octopress</id>
+    <content type="html"><![CDATA[<p>I'm joining the throngs of programmer-bloggers using <a href="http://octopress.org">Octopress</a> for my new blog.
+There's so much to commend about it, but it really comes down to one thing:</p>
+
+<p><em>Programmers should be able to write their blogs in text editors.</em></p>
+
+<p>Also, from now on, everything I ever do in my life should be in GitHub.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Hello, world]]></title>
