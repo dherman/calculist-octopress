@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Octopress | The Little Calculist]]></title>
+  <link href="http://calculist.org/blog/categories/octopress/atom.xml" rel="self"/>
+  <link href="http://calculist.org/"/>
+  <updated>2011-12-05T17:15:02-08:00</updated>
+  <id>http://calculist.org/</id>
+  <author>
+    <name><![CDATA[Dave Herman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Hello, world]]></title>
+    <link href="http://calculist.org/blog/2011/12/05/hello/"/>
+    <updated>2011-12-05T16:00:00-08:00</updated>
+    <id>http://calculist.org/blog/2011/12/05/hello</id>
+    <content type="html"><![CDATA[<p>This is my blog's new home.</p>
+
+<p>My old blogs:</p>
+
+<ul>
+<li><a href="http://calculist.blogspot.com">http://calculist.blogspot.com</a></li>
+<li><a href="http://blog.mozilla.com/dherman">http://blog.mozilla.com/dherman</a></li>
+</ul>
+
+
+<p>should stick around indefinitely as archives but they'll be inactive from now on.</p>
+]]></content>
+  </entry>
+  
+</feed>
