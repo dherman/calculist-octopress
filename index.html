@@ -9,8 +9,9 @@
   <meta name="author" content="Dave Herman">
 
   
-  <meta name="description" content="I&#8217;m joining the throngs of programmer-bloggers using Octopress for my new blog.
-There&#8217;s so much to commend about it, but it really comes &hellip;">
+  <meta name="description" content="The topic of coroutines (or
+fibers, or continuations) for JavaScript comes up from time to time,
+so I figured I&#8217;d write down my thoughts on &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -76,6 +77,75 @@ There&#8217;s so much to commend about it, but it really comes &hellip;">
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2011/12/14/why-coroutines-wont-work-on-the-web/">Why coroutines won&#8217;t work on the web</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-12-14T10:30:00-08:00" pubdate data-updated="true">Dec 14<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><img class="right" src="/images/yunocoros.jpg"> The topic of coroutines (or
+fibers, or continuations) for JavaScript comes up from time to time,
+so I figured I&#8217;d write down my thoughts on the matter. I admit to
+having a soft spot for crazy control-flow features like continuations,
+but they&#8217;re unlikely ever to make it into ECMAScript. With good
+reason.</p>
+
+<p>The big justification for coroutines in JavaScript is non-blocking
+I/O. As we all know, asynchronous I/O leads to callback API&#8217;s, which
+lead to nested lambdas, which lead to&#8230; the pyramid of doom:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="nx">range</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;preheat&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">pot</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;boil&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>        <span class="nx">rice</span><span class="p">.</span><span class="nx">on</span><span class="p">(</span><span class="s2">&quot;cooked&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+</span><span class='line'>            <span class="nx">dinner</span><span class="p">.</span><span class="nx">serve</span><span class="p">(</span><span class="nx">rice</span><span class="p">);</span>
+</span><span class='line'>        <span class="p">});</span>
+</span><span class='line'>    <span class="p">});</span>
+</span><span class='line'><span class="p">});</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+
+</div>
+  
+  
+    <footer>
+      <a rel="full-article" href="/blog/2011/12/14/why-coroutines-wont-work-on-the-web/">Read on &rarr;</a>
+    </footer>
+  
+
+
+    </article>
   
   
     <article>
@@ -175,6 +245,10 @@ There&#8217;s so much to commend about it, but it really comes down to one thing
     <section>
   <h1>Recent Posts</h1>
   <ul id="recent_posts">
+    
+      <li class="post">
+        <a href="/blog/2011/12/14/why-coroutines-wont-work-on-the-web/">Why coroutines won&#8217;t work on the web</a>
+      </li>
     
       <li class="post">
         <a href="/blog/2011/12/05/obligatory-fawning-over-octopress/">Obligatory fawning over Octopress</a>
