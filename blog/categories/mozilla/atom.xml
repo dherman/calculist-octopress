@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: mozilla | The Little Calculist]]></title>
+  <link href="http://calculist.org/blog/categories/mozilla/atom.xml" rel="self"/>
+  <link href="http://calculist.org/"/>
+  <updated>2012-01-10T08:22:41-08:00</updated>
+  <id>http://calculist.org/</id>
+  <author>
+    <name><![CDATA[Dave Herman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Two years at MoCo]]></title>
+    <link href="http://calculist.org/blog/2012/01/10/two-years-at-moco/"/>
+    <updated>2012-01-10T08:13:00-08:00</updated>
+    <id>http://calculist.org/blog/2012/01/10/two-years-at-moco</id>
+    <content type="html"><![CDATA[<p>If I remember right, today is my two year anniversary working full time at Mozilla. And it works out to about six years of working with Mozilla and <a href="http://www.ecma-international.org/memento/TC39.htm">TC39</a>. I could stop and get sentimental, but <a href="http://wiki.ecmascript.org/doku.php?id=harmony:proposals">there's work to do</a>.</p>
+]]></content>
+  </entry>
+  
+</feed>
