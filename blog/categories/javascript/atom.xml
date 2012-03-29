@@ -4,7 +4,7 @@
   <title><![CDATA[Category: JavaScript | The Little Calculist]]></title>
   <link href="http://calculist.org/blog/categories/javascript/atom.xml" rel="self"/>
   <link href="http://calculist.org/"/>
-  <updated>2012-01-10T08:22:41-08:00</updated>
+  <updated>2012-03-29T12:24:57-07:00</updated>
   <id>http://calculist.org/</id>
   <author>
     <name><![CDATA[Dave Herman]]></name>
@@ -12,6 +12,107 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Synchronous module loading in ES6]]></title>
+    <link href="http://calculist.org/blog/2012/03/29/synchronous-module-loading-in-es6/"/>
+    <updated>2012-03-29T07:41:00-07:00</updated>
+    <id>http://calculist.org/blog/2012/03/29/synchronous-module-loading-in-es6</id>
+    <content type="html"><![CDATA[<p>One of the great features of ES6 modules is the direct style module loading syntax:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">map</span> <span class="nx">from</span> <span class="s2">&quot;underscore.js&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">...</span> <span class="nx">map</span><span class="p">(</span><span class="nx">a</span><span class="p">,</span> <span class="nx">f</span><span class="p">)</span> <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This makes it as frictionless as possible to grow or refactor your code into multiple modules, and to pull third-party modules into an existing codebase. It also makes a common module format that can be shared between the browser and JS servers like Node.</p>
+
+<p>But this direct style requires loading its dependencies before it can execute. That is, it's a synchronous module load. Put in the context of a <code>script</code> tag, this would make it all too easy to block page rendering on I/O:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">$</span> <span class="nx">from</span> <span class="s2">&quot;jquery.js&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;myelement&#39;</span><span class="p">).</span><span class="nx">style</span><span class="p">({</span> <span class="s1">&#39;background-color&#39;</span><span class="o">:</span> <span class="s1">&#39;yellow&#39;</span> <span class="p">})</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p><img class="right" src="/images/boromir-sync.jpg"> Throwing this syntax into the browser like this would be an <a href="https://developer.mozilla.org/En/XMLHttpRequest/Using_XMLHttpRequest#Synchronous_and_asynchronous_requests">invitation to jank</a>. Thanks to insight from <a href="http://blogs.msdn.com/b/lukeh">Luke Hoban</a>, I think we have the right approach to this for ES6, which is in fact similar to our approach to avoiding turning <code>eval</code> into a synchronous I/O operation.</p>
+
+<p>In previous versions of ECMAScript, there's only one syntactic category of program that you can evaluate, called <code>Program</code> in the grammar. In ES6, we'll define a restricted version of the syntax to be used in synchronous settings, which makes it illegal to do synchronous loads. Within a blocking script, the only access to modules is via the dynamic loading API:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script&gt;</span>
+</span><span class='line'><span class="nx">System</span><span class="p">.</span><span class="nx">load</span><span class="p">(</span><span class="s2">&quot;jquery.js&quot;</span><span class="p">,</span> <span class="kd">function</span><span class="p">(</span><span class="nx">$</span><span class="p">)</span> <span class="p">{</span>
+</span><span class='line'>    <span class="nx">$</span><span class="p">(</span><span class="s1">&#39;myelement&#39;</span><span class="p">).</span><span class="nx">style</span><span class="p">({</span> <span class="s1">&#39;background-color&#39;</span><span class="o">:</span> <span class="s1">&#39;yellow&#39;</span> <span class="p">})</span>
+</span><span class='line'><span class="p">});</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This eliminates the footgun, and all of your modules can themselves use the synchronous loading syntax. For example, if <code>jquery.js</code> wants to use a module---say, a data structure library---it can go ahead and load it synchronously:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="c1">// jquery.js</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">Stack</span> <span class="nx">from</span> <span class="s2">&quot;utils.js&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="p">...</span> <span class="k">new</span> <span class="nx">Stack</span><span class="p">()</span> <span class="p">...</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>But still, this restriction on the top-level loses the convenience of directly importing modules from scripts. Thing is, in an asynchronous context, there's nothing wrong with doing a synchronous load. So just like the asynchronously loaded <code>jquery.js</code> can use the synchronous syntax, we can also allow it in a <code>defer</code> or <code>async</code> script:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+</pre></td><td class='code'><pre><code class='html'><span class='line'><span class="nt">&lt;/p&gt;</span>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;script </span><span class="na">async</span><span class="nt">&gt;</span>
+</span><span class='line'><span class="kr">import</span> <span class="nx">$</span> <span class="nx">from</span> <span class="s2">&quot;jquery.js&quot;</span><span class="p">;</span>
+</span><span class='line'><span class="nx">$</span><span class="p">(</span><span class="s1">&#39;myelement&#39;</span><span class="p">).</span><span class="nx">style</span><span class="p">({</span> <span class="s1">&#39;background-color&#39;</span><span class="o">:</span> <span class="s1">&#39;yellow&#39;</span> <span class="p">})</span>
+</span><span class='line'><span class="nt">&lt;/script&gt;</span>
+</span><span class='line'>
+</span><span class='line'>
+</span><span class='line'><span class="nt">&lt;p&gt;</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>This allows the full flexibility and expressiveness of ES6 embedded in HTML, without any hazard of blocking page rendering for I/O.</p>
+
+<p>The <code>eval</code> function for ES6 will work the same way, disallowing synchronous loading syntax in the grammar it recognizes, to prevent turning it into a synchronous API. We'll also add an asynchronous version of <code>eval</code> that, like <code>script async</code>, recognizes the full grammar.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[Why coroutines won't work on the web]]></title>
