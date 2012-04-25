@@ -9,7 +9,11 @@
   <meta name="author" content="Dave Herman">
 
   
-  <meta name="description" content="I&#8217;ve never really understood what &#8220;homoiconic&#8221; is supposed to mean. People often say something like &#8220;the syntax uses one of &hellip;">
+  <meta name="description" content="Here&#8217;s the deal: typed arrays are not fully portable. On most browsers, this code will print 1: 1
+2
+3
+var a1 = new Uint32Array([1]);
+var a2 = &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +79,80 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/04/24/the-little-endian-web/">The little-endian web?</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-04-24T22:32:00-07:00" pubdate data-updated="true">Apr 24<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Here&#8217;s the deal: <a href="http://www.khronos.org/registry/typedarray/specs/latest/">typed arrays</a> are not fully portable. On most browsers, this code will print 1:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">a1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">([</span><span class="mi">1</span><span class="p">]);</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">a1</span><span class="p">.</span><span class="nx">buffer</span><span class="p">);</span>
+</span><span class='line'><span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>But the typed arrays spec doesn&#8217;t specify a byte order. So a browser on a big-endian system (say, a PowerPC console like Xbox or PS3) is allowed to print 0. In short: <strong>casting an <code>ArrayBuffer</code> to different types is unportable by default.</strong> It&#8217;s up to web developers to canonicalize bytes for different architectures.</p>
+
+<p><img class="right" src="/images/nuxi.jpg"></p>
+
+<p>Now, we could just require typed arrays to be little-endian, once and for all. After all, almost all platforms are little-endian these days. The few big-endian platforms could just automatically reorder bytes for all typed array accesses. But this would have to be made to work with WebGL, which works by sending application-generated buffers to the GPU. In order to make this work on a big-endian architecture, little-endian-encoded <code>ArrayBuffer</code> data would need to be translated when sending back and forth to the GPU. Technically, <a href="http://lists.whatwg.org/htdig.cgi/whatwg-whatwg.org/2012-March/035236.html">this might be possible</a>, but there&#8217;s really no evidence that it would have acceptable performance.</p>
+
+<p>On the other hand, can we really trust that web applications will write portable code? Imagine a <a href="http://blog.faultylabs.com/files/md5.js">hashing algorithm</a> that builds an internal <code>ArrayBuffer</code> and casts it to different types. If the code isn&#8217;t written portably, it&#8217;ll break on a browser implementing big-endian typed arrays.</p>
+
+<p>This leaves big-endian browsers with a <strong>nasty decision</strong>: try to emulate little-endian typed arrays to protect against unportable application logic, and suffer the complexity and performance costs of translating data back and forth to the GPU, or just hope that not too many web pages break. Or perhaps surface an annoying decision to users: do you want to run this application in fast mode or correct mode?</p>
+
+<p>For now, we should let browser vendors on big-endian systems make that decision, and not force the decision through the spec. If they end up all choosing to emulate little-endian, I&#8217;ll be happy to codify that in the standards. As I understand it, <a href="http://www.floodgap.com/software/tenfourfox/">TenFourFox</a> can&#8217;t support WebGL, so there the best decision is probably to emulate little-endianness. On an Xbox, I would guess WebGL performance would be a higher priority than web sites using internal <code>ArrayBuffer</code>s. But I&#8217;m not sure. I&#8217;d say this is a decision for big-endian browsers to make, but <strong>I would greatly welcome their input</strong>.</p>
+
+<p>In the meantime, we should do everything we can to make portability more attractive and convenient. For working with I/O, where you need explicit control over endianness, applications can use <a href="https://developer.mozilla.org/en/JavaScript_typed_arrays/DataView">DataView</a>. For heterogeneous data, there&#8217;ll be ES6 <a href="http://wiki.ecmascript.org/doku.php?id=harmony:binary_data">structs</a>. Finally, I&#8217;d like to add an option for <code>ArrayBuffer</code>s and typed arrays to be given an optional explicit endianness:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">buffer</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ArrayBuffer</span><span class="p">(</span><span class="mi">1024</span><span class="p">,</span> <span class="s2">&quot;little&quot;</span><span class="p">);</span> <span class="c1">// a little-endian buffer</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a1</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint32Array</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+</span><span class='line'><span class="nx">a1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">a2</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+</span><span class='line'><span class="nx">a2</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span> <span class="c1">// must be 1, regardless of system architecture</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>With the endianness specified explicitly, you can still easily write portable logic even when casting&#8212;without having to canonicalize bytes yourself. <a href="https://github.com/kripken/emscripten">Emscripten</a> and <a href="http://www.mandreel.com/">Mandreel</a> could benefit from this increased portability, for example, and I think crypto algorithms would as well. I&#8217;ll propose this extension to Khronos and TC39, and discuss it with JavaScript engine implementors.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -493,6 +571,10 @@ There&#8217;s so much to commend about it, but it really comes down to one thing
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/04/24/the-little-endian-web/">The little-endian web?</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/04/17/homoiconicity-isnt-the-point/">Homoiconicity isn&#8217;t the point</a>
       </li>
     
@@ -506,10 +588,6 @@ There&#8217;s so much to commend about it, but it really comes down to one thing
     
       <li class="post">
         <a href="/blog/2011/12/14/why-coroutines-wont-work-on-the-web/">Why coroutines won&#8217;t work on the web</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2011/12/05/obligatory-fawning-over-octopress/">Obligatory fawning over Octopress</a>
       </li>
     
   </ul>
