@@ -4,7 +4,7 @@
   <title><![CDATA[The Little Calculist]]></title>
   <link href="http://calculist.org/atom.xml" rel="self"/>
   <link href="http://calculist.org/"/>
-  <updated>2012-04-24T23:08:06-07:00</updated>
+  <updated>2012-04-26T08:38:30-07:00</updated>
   <id>http://calculist.org/</id>
   <author>
     <name><![CDATA[Dave Herman]]></name>
@@ -12,6 +12,30 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[The little-endian web!]]></title>
+    <link href="http://calculist.org/blog/2012/04/25/the-little-endian-web/"/>
+    <updated>2012-04-25T12:29:00-07:00</updated>
+    <id>http://calculist.org/blog/2012/04/25/the-little-endian-web</id>
+    <content type="html"><![CDATA[<p><a href="http://en.wikipedia.org/wiki/The_Gates_of_Hell"><img class="right" src="http://calculist.org/images/gates-of-hell.jpg"></a></p>
+
+<blockquote><p><a href="http://calculist.org/blog/2012/04/24/the-little-endian-web/">This</a> feels a little bit like the web platform having opened a door to hell and Zombies running out of it. I wonder if we can ever close it again.
+&#8211; <a href="https://plus.google.com/u/1/116910304844117268718/posts/9fdegEJkAtt">Malte Ubl</a></p></blockquote>
+
+<p>Let&#8217;s see if we can. I&#8217;ve had a bunch of productive conversations since my <a href="http://calculist.org/blog/2012/04/24/the-little-endian-web/">post</a> the other day.</p>
+
+<p>I talked about how specifying little-endian would force big-endian browser vendors to choose one implementation strategy&#8212;emulate little-endian by byte-swapping and try to optimize as best they can&#8212;and concluded that it was better to let them decide for themselves and see how the market shakes out before specifying. But that doesn&#8217;t take into account the cost to web developers, which should always be the first priority (mea culpa).</p>
+
+<p>Leaving it unspecified or forcing developers to opt in to a specified endianness taxes developers: it leaves them open to the possibility of their sites breaking on systems they likely can&#8217;t even test on, or forces them to make sure they pass the argument (in which case, they&#8217;d always be one forgotten argument away from possible bustage on some platform they can&#8217;t test on).</p>
+
+<p>Imagine that instead of defaulting to unspecified behavior, we defaulted to little-endian&#8212;which is the de facto semantics of the web today&#8212;but apps could opt in to big-endian with an optional argument. Then a carefully-written app could use this (in combination with, say, a <code>navigator.endianness</code> feature test API) to decide which byte order would give them better performance. On little-endian systems, they&#8217;d use little-endian, on big-endian systems, they&#8217;d use big-endian. Less carefully-written apps that just went with the default might get some performance degradation in big-endian platforms, but we don&#8217;t actually know how bad it would be. But crucially, <strong>there would be no way to accidentally break your app&#8217;s behavior</strong>.</p>
+
+<p>But let me take it one step further. I don&#8217;t even think we know that that additional option will be needed. For now, we don&#8217;t even know of any big-endian user agents that are implementing WebGL, nor do we know if byte-swapping will be prohibitively expensive. Until then, I say any additional API surface area is premature optimization. <a href="http://en.wikipedia.org/wiki/You_ain%27t_gonna_need_it">YAGNI</a>.</p>
+
+<p>In summary: let&#8217;s prioritize web developers over hypothetical performance issues on hypothetical browsers. <strong>Typed arrays should be standardized as little-endian</strong>&#8212;full stop.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The little-endian web?]]></title>
