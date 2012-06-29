@@ -4,7 +4,7 @@
   <title><![CDATA[The Little Calculist]]></title>
   <link href="http://calculist.org/atom.xml" rel="self"/>
   <link href="http://calculist.org/"/>
-  <updated>2012-04-26T08:38:30-07:00</updated>
+  <updated>2012-06-29T13:42:20-07:00</updated>
   <id>http://calculist.org/</id>
   <author>
     <name><![CDATA[Dave Herman]]></name>
@@ -12,6 +12,113 @@
   </author>
   <generator uri="http://octopress.org/">Octopress</generator>
 
+  
+  <entry>
+    <title type="html"><![CDATA[Static module resolution]]></title>
+    <link href="http://calculist.org/blog/2012/06/29/static-module-resolution/"/>
+    <updated>2012-06-29T13:41:00-07:00</updated>
+    <id>http://calculist.org/blog/2012/06/29/static-module-resolution</id>
+    <content type="html"><![CDATA[<p>I haven&#8217;t spoken enough about the rationale for declarative, static module resolution in <a href="http://wiki.ecmascript.org/doku.php?id=harmony:modules">ES6 modules</a>. Since multiple module systems exist in pure JS, the concept of modules that involve new syntax is coming across as foreign to people. I&#8217;d like to explain the motivation.</p>
+
+<p>First, a quick explanation of what this is about. In a pure-JS system like CommonJS, modules are just objects, and whatever definitions they export can be imported by a client with object property lookup:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="p">{</span> <span class="nx">stat</span><span class="p">,</span> <span class="nx">exists</span><span class="p">,</span> <span class="nx">readFile</span> <span class="p">}</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;fs&#39;</span><span class="p">);</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>By contrast, in the ES6 module system, modules are not objects, they&#8217;re declarative collections of code. Importing definitions from a module is also declarative:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="p">{</span> <span class="nx">stat</span><span class="p">,</span> <span class="nx">exists</span><span class="p">,</span> <span class="nx">readFile</span> <span class="p">}</span> <span class="nx">from</span> <span class="s1">&#39;fs&#39;</span><span class="p">;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This import is resolved at compile time&#8212;that is, before the script starts executing. All the imports and exports of the declarative module dependency graph are resolved before execution. (There&#8217;s also an asynchronous dynamic loading API; it&#8217;s of course important to be able to defer module loading to runtime. But this post is about the resolution of a declarative module dependency graph.)</p>
+
+<h2>On the origin of specs</h2>
+
+<p><img class="right" src="http://calculist.org/images/evolution.jpg"></p>
+
+<p>Node leaders are arguing that we should take more incremental, evolutionary steps, that we should hew more closely to the module systems that exist today. I have a lot of sympathy for the &#8220;pave the cowpaths&#8221; philosophy, and I often argue for it. But the module systems people have built for JavaScript to date did not have the option of modifying the language. We have an opportunity to move JS in directions where a purely dynamic system could never go.</p>
+
+<p>What are some of those directions?</p>
+
+<h2>Fast lookup</h2>
+
+<p>Static imports (whether via <code>import</code> or references like <code>m.foo</code>) can always be compiled like variable references. In a dynamic module system, an explicit dereference like <code>m.foo</code> will be an object reference, which will generally require <a href="http://blog.cdleary.com/2010/09/picing-on-javascript-for-fun-and-profit/">PIC guards</a>. If you copy them into locals, they&#8217;ll be more optimizable in some cases, but with static modules you always predictably get early binding. Keeping module references as cheap as variable references makes modular programs faster and avoids imposing a tax on modular code.</p>
+
+<h2>Early variable checking</h2>
+
+<p>Having variable references, including imports and exports, checked before a script starts running is, in my experience, very useful for making sure the basic top-level structure of a program is sane. JavaScript is almost statically scoped, and this is our one and only chance to get there. James Burke dismisses this as a kind of <a href="http://tagneto.blogspot.ca/2012/06/es-modules-suggestions-for-improvement.html">shallow type checking</a>, which he claims is not enough to be useful. My experience in other languages says otherwise — it is super useful! Variable checking is a nice sweet spot where you can still write expressive dynamic programs, but catch really basic and common errors. As Anton Kovalyov points out, unbound variable reporting is a <a href="https://mail.mozilla.org/pipermail/es-discuss/2012-June/023777.html">popular feature in JSHint</a>, and it&#8217;s so much nicer not to have to run a separate linter to catch these bugs.</p>
+
+<h2>Cyclic dependencies</h2>
+
+<p>Allowing cyclic dependencies between modules is really important. Mutual recursion is a fact of programming. It occurs sometimes without you even noticing it. If you try splitting up your program into modules and the system breaks because it can&#8217;t handle cycles, the easiest workaround is just to keep everything together in one big module. Module systems should not prevent programmers from splitting up their program however they see fit. They should not provide disincentives from writing modular programs.</p>
+
+<p>This isn&#8217;t impossible with dynamic systems, but it tends to be something I see treated as an afterthought by alternative proposals. It&#8217;s something we&#8217;ve thought very carefully about for ES6. Also, declarative modules allow you to pre-initialize more of the module structure before executing any code, so that you can give better errors if someone refers to a not-yet-assigned export. For example, a <code>let</code> binding throws if you refer to it before it&#8217;s been assigned, and you get a clear error message. This is much easier to diagnose than referring to a property of a dynamic module object that just isn&#8217;t even there yet, getting <code>undefined</code>, and having to trace the eventual error back to the source.</p>
+
+<h2>Future-compatibility for macros</h2>
+
+<p>One of the things I would love to see in JavaScript&#8217;s future is the ability for programmers to come up with their own custom syntax extensions without having to wait for TC39 to add it. Today, people invent new syntax by writing their own compilers. But this is extremely hard to do, and you can&#8217;t use different syntax features from different compilers in a single source file.</p>
+
+<p>With macros, you might implement, say, a new <code>cond</code> syntax that makes a nicer alternative to chaining <code>? :</code> conditionals, and share that via a library:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kr">import</span> <span class="nx">cond</span> <span class="nx">from</span> <span class="s1">&#39;cond.js&#39;</span><span class="p">;</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">cond</span> <span class="p">{</span>
+</span><span class='line'>    <span class="k">case</span> <span class="p">(</span><span class="nx">x</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span><span class="o">:</span> <span class="s2">&quot;null&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="k">case</span> <span class="nb">Array</span><span class="p">.</span><span class="nx">isArray</span><span class="p">(</span><span class="nx">x</span><span class="p">)</span><span class="o">:</span> <span class="s2">&quot;array&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="k">case</span> <span class="p">(</span><span class="k">typeof</span> <span class="nx">x</span> <span class="o">===</span> <span class="s2">&quot;object&quot;</span><span class="p">)</span><span class="o">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+</span><span class='line'>    <span class="k">default</span><span class="o">:</span> <span class="k">typeof</span> <span class="nx">x</span>
+</span><span class='line'><span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>The <code>cond</code> macro would preprocess this into a chain of conditionals before the program runs. Preprocessing doesn&#8217;t work with purely dynamic modules:</p>
+
+<figure class='code'><figcaption><span></span></figcaption><div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='javascript'><span class='line'><span class="kd">var</span> <span class="nx">cond</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;cond.js&#39;</span><span class="p">);</span>
+</span><span class='line'><span class="p">...</span>
+</span><span class='line'><span class="c1">// impossible to preprocess because we haven&#39;t evaluated the require!</span>
+</span><span class='line'><span class="kd">var</span> <span class="nx">type</span> <span class="o">=</span> <span class="nx">cond</span> <span class="p">{</span> <span class="cm">/* etc */</span> <span class="p">};</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h2>Future-compatibility for types</h2>
+
+<p>I joined TC39 in the ill-fated ES4 days, when the committee was working on an optional type system for JS. It was built on sketchy foundations and ultimately fell apart. One of the things that was really lacking was a module system where you could draw a boundary around a section of code and say &#8220;this part needs to be type-checked.&#8221; Otherwise you never knew if more code was going to be appended later.</p>
+
+<p>Why types? Here&#8217;s one reason: JS is fast and getting faster, but it only gets <a href="http://blog.mrale.ph/post/12396216081/the-trap-of-the-performance-sweet-spot">harder to predict performance</a>. With experiments like <a href="http://lljs.org">LLJS</a>, my group at Mozilla is playing with dialects of JS that use types to pre-compile offline and generate some pretty funky JS code optimized for current JIT&#8217;s. But if you could just directly write your high-performance kernels in a typed dialect of JS, modern compilers could go to town with it.</p>
+
+<p>With declarative resolution, you can import and export typed definitions and they can all be checked at compile-time. Dynamic imports can&#8217;t be statically checked.</p>
+
+<h2>Inter-language modularity</h2>
+
+<p>Some people may not care about or want features like macros or types. But JavaScript has to serve many different programmers who come with many different development practices and needs. And one of the ways it can do so is by allowing people to use their own languages that compile to JavaScript. So even if macros or types aren&#8217;t in the future of the ECMAScript standard, it&#8217;d be pretty great if you could use statically typed or macro-enabled dialects of JS offline that compile to browser-compatible JS. People are already doing this kind of thing today with the <a href="https://developers.google.com/closure/compiler/">Closure compiler</a>&#8217;s type checking, or the <a href="http://roy.brianmckenna.org/">Roy</a> language, or <a href="https://github.com/clojure/clojurescript">ClojureScript</a>. A static module system is more universally and straightforwardly compatible with a wider range of languages.</p>
+
+<h2>Costs and benefits</h2>
+
+<p>The above are some of the benefits that I see to declarative module resolution. Isaac Schlueter says the <code>import</code> syntax <a href="http://blog.izs.me/post/25906678790/on-es-6-modules">adds nothing</a>. That&#8217;s unfair and wrong. It&#8217;s there for a purpose. I don&#8217;t believe that a declarative import syntax is a high cost for the benefit both to ES6 and to potential future editions.</p>
+
+<h2>PS: What&#8217;s all this about Python?</h2>
+
+<p>One last thing: people keep claiming that the ES6 module system came from Python. I don&#8217;t even have very much experience with Python. And Python&#8217;s modules are more mutable and their scope is more dynamic. Personally, I&#8217;ve drawn inspiration from <a href="http://racket-lang.org">Racket</a>, which has gotten lots of mileage out of its <a href="http://docs.racket-lang.org/guide/Module_Syntax.html">declarative module system</a>. They&#8217;ve leveraged static modules to build a macro system, early variable checking, optimized references, dynamic contracts with module-based blame reporting, multi-language interoperability, and a statically typed dialect.</p>
+
+<p>I&#8217;m not interested in making JavaScript into some other language. But you can learn a lot from studying precedent in other languages. I&#8217;ve seen firsthand the benefits you can get from a declarative module system in a dynamic language.</p>
+]]></content>
+  </entry>
   
   <entry>
     <title type="html"><![CDATA[The little-endian web!]]></title>
