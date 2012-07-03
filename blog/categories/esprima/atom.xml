@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: Esprima | The Little Calculist]]></title>
+  <link href="http://calculist.org/blog/categories/esprima/atom.xml" rel="self"/>
+  <link href="http://calculist.org/"/>
+  <updated>2012-07-03T12:08:02-07:00</updated>
+  <id>http://calculist.org/</id>
+  <author>
+    <name><![CDATA[Dave Herman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[Tweaking the JavaScript AST API]]></title>
+    <link href="http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api/"/>
+    <updated>2012-07-03T11:53:00-07:00</updated>
+    <id>http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api</id>
+    <content type="html"><![CDATA[<p>A couple years ago I created a <a href="https://developer.mozilla.org/en/SpiderMonkey/Parser_API">JavaScript parser API</a> and implemented SpiderMonkey's <a href="https://developer.mozilla.org/en/SpiderMonkey/Parser_API#Reflect.parse%28src.5B.2C_options.5D%29">Reflect.parse</a> library. Since then, there have been a couple of pure JavaScript implementations of the API, including Zach Carter's <a href="https://github.com/zaach/reflect.js">reflect.js</a> and Ariya Hidayat's <a href="http://esprima.org">Esprima</a> parser.</p>
+
+<p>Over time, I've gotten a bunch of good critiques about the API from people. I probably don't want to make any huge changes, but there are a couple of small changes that would be nice:</p>
+
+<ul>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=770567">Bug 770567</a> - rename <code>callee</code> to <code>constructor</code> to match the documentation</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=742612">Bug 742612</a> - separate guarded/unguarded catch clauses</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=745678">Bug 745678</a> - range-based location info</li>
+</ul>
+
+
+<p>Ariya is graciously willing to change Esprima to keep in sync with SpiderMonkey. But some of these would affect existing clients of either library. I wanted to post this publicly to ask if there's anyone who would be opposed to us making the change. Ariya and I would make sure to be very clear about when we're making the change, and we'd try to batch the changes so that people don't have to keep repeatedly updating their code.</p>
+
+<p>Feel free to leave a comment if you are using Esprima or <code>Reflect.parse</code> and have thoughts about this.</p>
+]]></content>
+  </entry>
+  
+</feed>

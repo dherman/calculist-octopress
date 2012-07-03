@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Category: JavaScript - The Little Calculist</title>
+  <title>Tweaking the JavaScript AST API - The Little Calculist</title>
   <meta name="author" content="Dave Herman">
 
   
-  <meta name="description" content="Category: JavaScript">
+  <meta name="description" content="A couple years ago I created a JavaScript parser API and implemented SpiderMonkey&#8217;s Reflect.parse library. Since then, there have been a couple &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://calculist.orgblog/categories/javascript">
+  <link rel="canonical" href="http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api">
   <link href="/favicon.png" rel="icon">
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
   <script src="/javascripts/modernizr-2.0.js"></script>
@@ -74,67 +74,104 @@
   <div id="main">
     <div id="content">
       <div>
-<article role="article">
+<article class="hentry" role="article">
   
   <header>
-    <h1 class="entry-title">Category: JavaScript</h1>
+    
+      <h1 class="entry-title">Tweaking the JavaScript AST API</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-03T11:53:00-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2012</time>
+        
+      </p>
     
   </header>
-  
-  <div id="blog-archives" class="category">
 
 
+<div class="entry-content"><p>A couple years ago I created a <a href="https://developer.mozilla.org/en/SpiderMonkey/Parser_API">JavaScript parser API</a> and implemented SpiderMonkey&#8217;s <a href="https://developer.mozilla.org/en/SpiderMonkey/Parser_API#Reflect.parse%28src.5B.2C_options.5D%29">Reflect.parse</a> library. Since then, there have been a couple of pure JavaScript implementations of the API, including Zach Carter&#8217;s <a href="https://github.com/zaach/reflect.js">reflect.js</a> and Ariya Hidayat&#8217;s <a href="http://esprima.org">Esprima</a> parser.</p>
 
-  
-  <h2>2012</h2>
+<p>Over time, I&#8217;ve gotten a bunch of good critiques about the API from people. I probably don&#8217;t want to make any huge changes, but there are a couple of small changes that would be nice:</p>
 
-<article>
-  
-<h1><a href="/blog/2012/07/03/tweaking-the-javascript-ast-api/">Tweaking the JavaScript AST API</a></h1>
-<time datetime="2012-07-03T11:53:00-07:00" pubdate><span class='month'>Jul</span> <span class='day'>03</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/ast/'>AST</a>, <a class='category' href='/blog/categories/esprima/'>Esprima</a>, <a class='category' href='/blog/categories/javascript/'>JavaScript</a>, <a class='category' href='/blog/categories/parser-api/'>Parser API</a></span>
-</footer>
+<ul>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=770567">Bug 770567</a> - rename <code>callee</code> to <code>constructor</code> to match the documentation</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=742612">Bug 742612</a> - separate guarded/unguarded catch clauses</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=745678">Bug 745678</a> - range-based location info</li>
+</ul>
 
 
-</article>
+<p>Ariya is graciously willing to change Esprima to keep in sync with SpiderMonkey. But some of these would affect existing clients of either library. I wanted to post this publicly to ask if there&#8217;s anyone who would be opposed to us making the change. Ariya and I would make sure to be very clear about when we&#8217;re making the change, and we&#8217;d try to batch the changes so that people don&#8217;t have to keep repeatedly updating their code.</p>
 
-
-
-<article>
-  
-<h1><a href="/blog/2012/03/29/synchronous-module-loading-in-es6/">Synchronous module loading in ES6</a></h1>
-<time datetime="2012-03-29T07:41:00-07:00" pubdate><span class='month'>Mar</span> <span class='day'>29</span> <span class='year'>2012</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/javascript/'>JavaScript</a>, <a class='category' href='/blog/categories/async/'>async</a>, <a class='category' href='/blog/categories/modules/'>modules</a></span>
-</footer>
-
-
-</article>
-
-
-
-  
-  <h2>2011</h2>
-
-<article>
-  
-<h1><a href="/blog/2011/12/14/why-coroutines-wont-work-on-the-web/">Why coroutines won't work on the web</a></h1>
-<time datetime="2011-12-14T10:30:00-08:00" pubdate><span class='month'>Dec</span> <span class='day'>14</span> <span class='year'>2011</span></time>
-
-<footer>
-  <span class="categories">posted in <a class='category' href='/blog/categories/javascript/'>JavaScript</a>, <a class='category' href='/blog/categories/continuations/'>continuations</a>, <a class='category' href='/blog/categories/coroutines/'>coroutines</a>, <a class='category' href='/blog/categories/generators/'>generators</a></span>
-</footer>
-
-
-</article>
-
+<p>Feel free to leave a comment if you are using Esprima or <code>Reflect.parse</code> and have thoughts about this.</p>
 </div>
 
+
+  <footer>
+    <p class="meta">
+      
   
+
+<span class="byline author vcard">Posted by <span class="fn">Dave Herman</span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-03T11:53:00-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/ast/'>AST</a>, <a class='category' href='/blog/categories/esprima/'>Esprima</a>, <a class='category' href='/blog/categories/javascript/'>JavaScript</a>, <a class='category' href='/blog/categories/parser-api/'>Parser API</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api/" data-via="littlecalculist" data-counturl="http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api/" >Tweet</a>
+  
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/blog/2012/06/29/static-module-resolution/" title="Previous Post: Static module resolution">&laquo; Static module resolution</a>
+      
+      
+    </p>
+  </footer>
 </article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
 
 </div>
 
@@ -206,7 +243,10 @@
       var disqus_shortname = 'littlecalculist';
       
         
-        var disqus_script = 'count.js';
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api/';
+        var disqus_url = 'http://calculist.org/blog/2012/07/03/tweaking-the-javascript-ast-api/';
+        var disqus_script = 'embed.js';
       
     (function () {
       var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

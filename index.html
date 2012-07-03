@@ -9,7 +9,7 @@
   <meta name="author" content="Dave Herman">
 
   
-  <meta name="description" content="I haven&#8217;t spoken enough about the rationale for declarative, static module resolution in ES6 modules. Since multiple module systems exist in &hellip;">
+  <meta name="description" content="A couple years ago I created a JavaScript parser API and implemented SpiderMonkey&#8217;s Reflect.parse library. Since then, there have been a couple &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -75,6 +75,55 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/blog/2012/07/03/tweaking-the-javascript-ast-api/">Tweaking the JavaScript AST API</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-07-03T11:53:00-07:00" pubdate data-updated="true">Jul 3<span>rd</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>A couple years ago I created a <a href="https://developer.mozilla.org/en/SpiderMonkey/Parser_API">JavaScript parser API</a> and implemented SpiderMonkey&#8217;s <a href="https://developer.mozilla.org/en/SpiderMonkey/Parser_API#Reflect.parse%28src.5B.2C_options.5D%29">Reflect.parse</a> library. Since then, there have been a couple of pure JavaScript implementations of the API, including Zach Carter&#8217;s <a href="https://github.com/zaach/reflect.js">reflect.js</a> and Ariya Hidayat&#8217;s <a href="http://esprima.org">Esprima</a> parser.</p>
+
+<p>Over time, I&#8217;ve gotten a bunch of good critiques about the API from people. I probably don&#8217;t want to make any huge changes, but there are a couple of small changes that would be nice:</p>
+
+<ul>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=770567">Bug 770567</a> - rename <code>callee</code> to <code>constructor</code> to match the documentation</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=742612">Bug 742612</a> - separate guarded/unguarded catch clauses</li>
+<li><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=745678">Bug 745678</a> - range-based location info</li>
+</ul>
+
+
+<p>Ariya is graciously willing to change Esprima to keep in sync with SpiderMonkey. But some of these would affect existing clients of either library. I wanted to post this publicly to ask if there&#8217;s anyone who would be opposed to us making the change. Ariya and I would make sure to be very clear about when we&#8217;re making the change, and we&#8217;d try to batch the changes so that people don&#8217;t have to keep repeatedly updating their code.</p>
+
+<p>Feel free to leave a comment if you are using Esprima or <code>Reflect.parse</code> and have thoughts about this.</p>
+</div>
+  
+  
+
+
+    </article>
   
   
     <article>
@@ -752,6 +801,10 @@ There&#8217;s so much to commend about it, but it really comes down to one thing
   <ul id="recent_posts">
     
       <li class="post">
+        <a href="/blog/2012/07/03/tweaking-the-javascript-ast-api/">Tweaking the JavaScript AST API</a>
+      </li>
+    
+      <li class="post">
         <a href="/blog/2012/06/29/static-module-resolution/">Static module resolution</a>
       </li>
     
@@ -765,10 +818,6 @@ There&#8217;s so much to commend about it, but it really comes down to one thing
     
       <li class="post">
         <a href="/blog/2012/04/17/homoiconicity-isnt-the-point/">Homoiconicity isn&#8217;t the point</a>
-      </li>
-    
-      <li class="post">
-        <a href="/blog/2012/03/29/synchronous-module-loading-in-es6/">Synchronous module loading in ES6</a>
       </li>
     
   </ul>
