@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: structural types | The Little Calculist]]></title>
+  <link href="http://calculist.org/blog/categories/structural-types/atom.xml" rel="self"/>
+  <link href="http://calculist.org/"/>
+  <updated>2012-07-16T16:26:04-07:00</updated>
+  <id>http://calculist.org/</id>
+  <author>
+    <name><![CDATA[Dave Herman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[JavaScript's two array types]]></title>
+    <link href="http://calculist.org/blog/2012/07/16/javascripts-two-array-types/"/>
+    <updated>2012-07-16T15:06:00-07:00</updated>
+    <id>http://calculist.org/blog/2012/07/16/javascripts-two-array-types</id>
+    <content type="html"><![CDATA[<p>Imagine a <code>BitSet</code> constructor with an overloaded API for setting bits:</p>
+
+<p>```javascript
+var bits = new BitSet();</p>
+
+<p>bits.set(4);
+bits.set([1, 4, 8, 17]);
+```</p>
+
+<p>The interface for <code>BitSet.prototype.set</code> is:</p>
+
+<p><code>
+// set :: (number | [number]) -&gt; undefined
+</code></p>
+
+<p>Now imagine a <code>StringSet</code> constructor with an overloaded API for adding strings:</p>
+
+<p>```javascript
+var set = new StringSet();</p>
+
+<p>set.add('foo');
+set.add(['foo', 'bar', 'baz']);
+set.add({ foo: true, bar: true, baz: true });
+```</p>
+
+<p>The interface for <code>StringSet.prototype.add</code> is something like:</p>
+
+<p><code>
+// add :: (string | [string] | object) -&gt; undefined
+</code></p>
+
+<p>These both look pretty similar, but there's a critical difference. Think about how you might implement <code>BitSet.prototype.set</code>:</p>
+
+<p>```javascript
+BitSet.prototype.set = function set(x) {</p>
+
+<pre><code>// number case
+if (typeof x === 'number') {
+    this._add1(x);
+    return;
+}
+// array case
+for (var i = 0, n = x.length; i &lt; n; i++) {
+    this._add1(x[i]);
+}
+</code></pre>
+
+<p>};
+```</p>
+
+<p>Now think about how you might implement <code>StringSet.prototype.add</code>:</p>
+
+<p>```javascript
+StringSet.prototype.add = function add(x) {</p>
+
+<pre><code>// string case
+if (typeof x === 'string') {
+    this._add1(x);
+    return;
+}
+// array case
+if (/* hmmmm... */) {
+    for (var i = 0, n = x.length; i &lt; n; i++) {
+        this._add1(x[i]);
+    }
+    return;
+}
+// object case
+for (var key in x) {
+    if ({}.hasOwnProperty.call(x, key)) {
+        this._add1(key);
+    }
+}
+</code></pre>
+
+<p>};
+```</p>
+
+<p>What's the difference? <code>BitSet.prototype.set</code> doesn't have to test whether its argument is an array. It'll work for any object that acts like an array (i.e., has indexed properties and a numeric <code>length</code> property). It'll even accept values like an <code>arguments</code> object, a <code>NodeList</code>, some custom object you create that acts like an array, or even a primitive string.</p>
+
+<p>But <code>StringSet.prototype.add</code> actually needs a test to see if <code>x</code> is an array. How do you distinguish between arrays and objects when JavaScript arrays <em>are</em> objects?</p>
+
+<p>One answer you'll sometimes see is what I call "duck testing": use some sort of heuristic that <em>probably</em> indicates the client intended the argument to be an array:</p>
+
+<p>```javascript
+if (typeof x.length === 'number') {</p>
+
+<pre><code>// ...
+</code></pre>
+
+<p>}
+```</p>
+
+<p>Beware the word "probably" in programming! Duck testing is a horribly medieval form of computer science:</p>
+
+<iframe width="640" height="390" src="http://www.youtube.com/embed/zrzMhU_4m-g" frameborder="0" allowfullscreen></iframe>
+
+
+<p>For example, what happens when a user happens to pass in a dictionary object with the string <code>'length'</code>?</p>
+
+<p><code>javascript
+symbolTable.add({ a: 1, i: 1, length: 1 });
+</code></p>
+
+<p>The user clearly intended this to be the dictionary case, but the duck test saw a numeric <code>'length'</code> property and gleefully proclaimed "it's an array!"</p>
+
+<p>This comes down to the difference between <em>nominal</em> and <em>structural</em> types.</p>
+
+<p>A <strong>nominal type</strong> is a type that has a unique identity or "brand." It carries a tag with it that can be atomically tested to distinguish it from other types.</p>
+
+<p>A <strong>structural type</strong>, also known as a duck type, is a kind of interface: it's just a contract that mandates certain behaviors, but doesn't say anything about what specific implementation is used to provide that behavior. The reason people have such a hard time figuring out how to test for structural types is that they are designed specifically <em>not to be testable</em>!</p>
+
+<p>There are a few common scenarios in dynamically typed languages where you need to do dynamic type testing, such as error checking, debugging, and inrospection. But the most common case is when implementing overloaded API's like the <code>set</code> and <code>add</code> methods above.</p>
+
+<p>The <code>BitSet.prototype.set</code> method treats arrays as a structural type: they can be any kind of value whatsoever as long as they have indexed properties with corresponding <code>length</code>. But <code>StringSet.prototype.add</code> overloads array and object types, so it has to check for "arrayness." And you can't reliably check for structural types.</p>
+
+<p>It's specifically when you <strong>overload arrays and objects</strong> that you need a predictable nominal type test. One answer would be to punt and change the API so the client has to explicitly tag the variants:</p>
+
+<p><code>javascript
+set.add({ key: 'foo' });
+set.add({ array: ['foo', 'bar', 'baz'] });
+set.add({ dict: { foo: true, bar: true, baz: true } });
+</code></p>
+
+<p>This overloads three different objects types that can be distinguished by their relevant property names. Or you could get rid of overloading altogether:</p>
+
+<p><code>javascript
+set.add('foo');
+set.addArray(['foo', 'bar', 'baz']);
+set.addDict({ foo: true, bar: true, baz: true });
+</code></p>
+
+<p>But these API's are heavier and clunkier. Rather than rigidly avoiding overloading arrays and objects, the lighter-weight approach is to use JavaScript's latent notion of a "true" array: an object whose <a href="http://es5.github.com/#x8.6.2">[[Class]] internal property</a> is <code>"Array"</code>. That internal property serves as the brand for a built-in nominal type of JavaScript. And it's a pretty good candidate for a universally available nominal type: clients get the concise array literal syntax, and the ES5 <a href="https://developer.mozilla.org/en/JavaScript/Reference/Global_Objects/Array/isArray">Array.isArray</a> function (which can be <a href="http://perfectionkills.com/instanceof-considered-harmful-or-how-to-write-a-robust-isarray/">shimmed pretty reliably</a> in older JavaScript engines) provides the exact test needed to implement the API.</p>
+
+<p>But this test is very different from the structural type accepted by <code>BitSet.prototype.set</code>. For example, you can't pass an <code>arguments</code> object to <code>StringSet.prototype.add</code>:</p>
+
+<p>```javascript
+MyClass.prototype.update = function update() {</p>
+
+<pre><code>this.wibbles.add(arguments);
+</code></pre>
+
+<p>};
+```</p>
+
+<p>This code clearly means to pass <code>arguments</code> as an array, but it'll get interpreted as a dictionary. Similarly, you can't pass a <code>NodeList</code>, or a primitive string, or any other JavaScript value that acts array-like.</p>
+
+<p>In other words, <strong>JavaScript has <em>two</em> latent concepts of array types</strong>. Library writers should clearly document when their API's accept any <em>array-like</em> value (i.e., the structural type) and when they require a true array (i.e., the nominal type). That way clients know whether they need to convert array-like values to true arrays before passing them in.</p>
+
+<p>As a final note, ES6's <a href="http://wiki.ecmascript.org/doku.php?id=strawman:array_extras">Array.from</a> API will do that exact conversion. This would make it very convenient, for example, for the <code>update</code> method above to be fixed:</p>
+
+<p>```javascript
+MyClass.prototype.update = function update() {</p>
+
+<pre><code>this.wibbles.add(Array.from(arguments));
+</code></pre>
+
+<p>};
+```</p>
+
+<p><em>Thanks to Rick Waldron for helping me come to this understanding during an awesome IRC conversation this morning.</em></p>
+]]></content>
+  </entry>
+  
+</feed>
