@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: announcements | The Little Calculist]]></title>
+  <link href="http://calculist.org/blog/categories/announcements/atom.xml" rel="self"/>
+  <link href="http://calculist.org/"/>
+  <updated>2012-08-17T09:40:43-07:00</updated>
+  <id>http://calculist.org/</id>
+  <author>
+    <name><![CDATA[Dave Herman]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[ECMAScript Doc Sprint next Thursday]]></title>
+    <link href="http://calculist.org/blog/2012/08/17/ecmascript-doc-sprint-next-thursday/"/>
+    <updated>2012-08-17T08:43:00-07:00</updated>
+    <id>http://calculist.org/blog/2012/08/17/ecmascript-doc-sprint-next-thursday</id>
+    <content type="html"><![CDATA[<p>I've been working on a <a href="https://github.com/dherman/tc39-codex-wiki">reboot to the ECMAScript web site</a> lately, which you can preview at <a href="http://tc39wiki.calculist.org">tc39wiki.calculist.org</a>. One of the most important parts of this will be a set of <a href="http://tc39wiki.calculist.org/es6/">high-level descriptions of the proposals for ES6</a>.</p>
+
+<p>We will be hosting a <strong>virtual doc sprint</strong> to work on these pages next <strong>Thursday, August 23rd</strong>. If you enjoy writing documentation or coming up with bite-sized example programs to demonstrate new language features, please join us! A few of us will be on US Eastern time, so starting around 9 - 10am UTC-5, and others will be coming online on US Pacific time, around 9am UTC-8. You're welcome to join us for any part of the day.</p>
+
+<p>We'll be hanging out all day in the <code>#jsdocs</code> channel on <a href="http://irc.mozilla.org">irc.mozilla.org</a>. Hope you can join us!</p>
+]]></content>
+  </entry>
+  
+</feed>
